@@ -77,6 +77,17 @@ img {
   max-width: 100%;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .site-header {
   position: fixed;
   top: 18px;
@@ -185,7 +196,8 @@ img {
 .hero {
   position: relative;
   display: grid;
-  min-height: 92svh;
+  height: 100vh;
+  min-height: 100vh;
   place-items: center;
   overflow: hidden;
   padding: 120px 24px 90px;
@@ -410,14 +422,16 @@ img {
 
 .map-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 24px;
   padding: 24px;
 }
 
 .japan-map {
   position: relative;
-  min-height: 680px;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 777 / 482;
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 80%);
   border-radius: 26px;
@@ -442,32 +456,20 @@ img {
   left: calc(var(--x) * 1%);
   display: grid;
   width: calc(var(--w) * 1%);
-  min-width: 38px;
   height: calc(var(--h) * 1%);
-  min-height: 34px;
   place-items: center;
-  padding: 4px 6px;
+  padding: 0;
   color: rgb(44 43 54 / 54%);
   text-align: center;
   background: rgb(255 255 255 / 74%);
   border: 1px solid rgb(255 255 255 / 58%);
-  border-radius: 10px;
+  border-radius: clamp(3px, 0.7vw, 8px);
   corner-shape: superellipse(1.15);
   box-shadow: 0 10px 24px rgb(95 73 85 / 7%);
   transition:
     background 160ms ease,
     box-shadow 160ms ease,
     transform 160ms ease;
-}
-
-.prefecture-button strong {
-  font-size: 0.66rem;
-  font-weight: 760;
-  line-height: 1.1;
-}
-
-.prefecture-button small {
-  display: none;
 }
 
 .prefecture-button[data-map-region="hokkaido"],
@@ -506,12 +508,9 @@ img {
   box-shadow: 0 16px 36px rgb(236 120 156 / 30%);
 }
 
-.prefecture-button.is-visited small {
-  color: rgb(255 255 255 / 78%);
-}
-
 .prefecture-button:disabled {
   cursor: default;
+  opacity: 0.5;
 }
 
 .prefecture-button.is-visited:hover {
@@ -553,6 +552,62 @@ img {
 
 .metric-list dd {
   font-weight: 760;
+}
+
+.timeline-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: rgb(255 255 255 / 62%);
+  border: 1px solid rgb(255 255 255 / 72%);
+  border-radius: 18px;
+  corner-shape: superellipse(1.15);
+}
+
+.timeline-head h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.timeline-list {
+  display: grid;
+  max-height: 276px;
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-color: rgb(236 120 156 / 52%) transparent;
+}
+
+.timeline-list a {
+  display: grid;
+  grid-template-columns: 4.8rem minmax(0, 1fr);
+  gap: 4px 10px;
+  padding: 11px 2px 11px 12px;
+  border-left: 1px solid rgb(236 120 156 / 24%);
+}
+
+.timeline-list a:hover {
+  color: var(--rose-700);
+}
+
+.timeline-list time {
+  color: var(--rose-700);
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.timeline-list span {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.9rem;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-list small {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 0.76rem;
 }
 
 .world-grid,
@@ -621,17 +676,36 @@ img {
   place-items: center;
   padding: 22px;
   background: rgb(44 43 54 / 24%);
+  opacity: 0;
   backdrop-filter: blur(10px);
+  transition: opacity 180ms ease;
+}
+
+.trip-dialog.is-open {
+  opacity: 1;
 }
 
 .dialog-surface {
+  display: grid;
   width: min(520px, 100%);
+  max-height: min(720px, calc(100vh - 44px));
   padding: 24px;
+  overflow: hidden;
   background: rgb(255 255 255 / 86%);
   border: 1px solid rgb(255 255 255 / 80%);
   border-radius: 30px;
   corner-shape: superellipse(1.25);
   box-shadow: 0 28px 90px rgb(74 47 61 / 22%);
+  opacity: 0;
+  transform: translateY(14px) scale(0.96);
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.trip-dialog.is-open .dialog-surface {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .dialog-top {
@@ -663,6 +737,10 @@ img {
   display: grid;
   gap: 10px;
   margin-top: 20px;
+  max-height: min(520px, calc(100vh - 190px));
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-color: rgb(236 120 156 / 52%) transparent;
 }
 
 .dialog-list a {
@@ -805,10 +883,6 @@ img {
     grid-template-columns: 1fr;
   }
 
-  .japan-map {
-    min-height: 600px;
-  }
-
   .world-grid,
   .category-grid,
   .post-grid,
@@ -863,20 +937,8 @@ img {
     padding: 14px;
   }
 
-  .japan-map {
-    min-height: 520px;
-  }
-
-  .prefecture-button {
-    padding: 5px;
-  }
-
-  .prefecture-button strong {
-    font-size: 0.64rem;
-  }
-
-  .prefecture-button small {
-    display: none;
+  .timeline-list {
+    max-height: 220px;
   }
 
   .world-grid,
@@ -907,5 +969,12 @@ img {
 @media (max-width: 420px) {
   .hero h1 {
     font-size: 3.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-dialog,
+  .dialog-surface {
+    transition: none;
   }
 }
