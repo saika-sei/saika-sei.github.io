@@ -3,7 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import { prefectures } from '@/data/prefectures';
 import { primaryCategories } from '@/data/site';
 import { recentPosts } from '@/data/posts';
-import { travelTrips, tripsByPrefecture, visitedPrefectures } from '@/data/travel';
+import { travelTrips, tripsByPrefecture } from '@/data/travel';
 import { otherTopics, studyTopics } from '@/data/topics';
 
 const japanTrips = travelTrips.filter((trip) => trip.region === 'japan');
@@ -78,7 +78,7 @@ const mapPoints = prefectures.map((prefecture) => {
                 data-map-region={point.region}
                 data-trips={JSON.stringify(point.trips)}
               >
-                <span class="sr-only">{point.ko}</span>
+                <span class="prefecture-name" aria-hidden="true">{point.jp}</span>
               </button>
             ))}
           </div>
@@ -86,22 +86,7 @@ const mapPoints = prefectures.map((prefecture) => {
             <div class="section-heading slim">
               <p class="eyebrow">Japan</p>
               <h2>일본</h2>
-              <p>{visitedPrefectures.length}개 현, {japanTrips.length}개 여행.</p>
             </div>
-            <dl class="metric-list">
-              <div>
-                <dt>방문 현</dt>
-                <dd>{visitedPrefectures.length}</dd>
-              </div>
-              <div>
-                <dt>일본 여행</dt>
-                <dd>{japanTrips.length}</dd>
-              </div>
-              <div>
-                <dt>전체 여행 글</dt>
-                <dd>117</dd>
-              </div>
-            </dl>
             <div class="timeline-card">
               <div class="timeline-head">
                 <p class="eyebrow">Timeline</p>
