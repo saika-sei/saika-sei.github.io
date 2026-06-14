@@ -422,28 +422,41 @@ img {
 
 .map-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 24px;
-  padding: 24px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: start;
+  gap: clamp(18px, 2.4vw, 28px);
+  padding: clamp(22px, 3vw, 34px);
+  overflow: visible;
+  box-shadow: 0 14px 34px rgb(184 93 129 / 10%);
 }
 
 .japan-map {
+  --cols: 18;
+  --rows: 18;
+  --gap: clamp(2px, 0.32vw, 4px);
+  --map-pad: clamp(22px, 4vw, 50px);
   position: relative;
-  width: 100%;
+  justify-self: center;
+  width: min(560px, 100%);
   min-height: 0;
-  aspect-ratio: 777 / 482;
+  aspect-ratio: 1 / 1;
+  padding: var(--map-pad);
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 80%);
   border-radius: 26px;
   corner-shape: superellipse(1.25);
   background:
-    linear-gradient(120deg, rgb(255 255 255 / 82%), rgb(255 246 249 / 72%)),
-    linear-gradient(180deg, rgb(167 215 246 / 22%), transparent 42%);
+    radial-gradient(circle at 76% 18%, rgb(167 215 246 / 22%), transparent 34%),
+    linear-gradient(120deg, rgb(255 255 255 / 84%), rgb(255 246 249 / 76%)),
+    linear-gradient(180deg, rgb(236 120 156 / 10%), transparent 46%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 78%),
+    0 10px 24px rgb(184 93 129 / 8%);
 }
 
 .map-ribbon {
   position: absolute;
-  inset: 20px;
+  inset: clamp(14px, 2.8vw, 32px);
   pointer-events: none;
   border: 1px dashed rgb(185 116 142 / 18%);
   border-radius: 28px;
@@ -451,66 +464,57 @@ img {
 }
 
 .prefecture-button {
+  --cell-w: calc((100% - (var(--map-pad) * 2) - ((var(--cols) - 1) * var(--gap))) / var(--cols));
+  --cell-h: calc((100% - (var(--map-pad) * 2) - ((var(--rows) - 1) * var(--gap))) / var(--rows));
   position: absolute;
-  top: calc(var(--y) * 1%);
-  left: calc(var(--x) * 1%);
+  top: calc(var(--map-pad) + (var(--y) * (var(--cell-h) + var(--gap))));
+  left: calc(var(--map-pad) + (var(--x) * (var(--cell-w) + var(--gap))));
   display: grid;
-  width: calc(var(--w) * 1%);
-  height: calc(var(--h) * 1%);
+  width: calc((var(--w) * var(--cell-w)) + ((var(--w) - 1) * var(--gap)));
+  height: calc((var(--h) * var(--cell-h)) + ((var(--h) - 1) * var(--gap)));
   place-items: center;
-  padding: 0;
-  color: rgb(44 43 54 / 54%);
+  padding: 1px;
+  overflow: hidden;
+  color: rgb(92 88 100 / 76%);
   text-align: center;
-  background: rgb(255 255 255 / 74%);
-  border: 1px solid rgb(255 255 255 / 58%);
+  background: linear-gradient(145deg, #f4f5f8, #e9ecf1);
+  border: 1px solid rgb(255 255 255 / 76%);
   border-radius: clamp(3px, 0.7vw, 8px);
   corner-shape: superellipse(1.15);
-  box-shadow: 0 10px 24px rgb(95 73 85 / 7%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 74%),
+    0 1px 2px rgb(95 73 85 / 5%);
   transition:
     background 160ms ease,
     box-shadow 160ms ease,
     transform 160ms ease;
 }
 
-.prefecture-button[data-map-region="hokkaido"],
-.prefecture-button[data-map-region="tohoku"],
-.prefecture-button[data-map-region="kanto"] {
-  color: white;
-  background: linear-gradient(135deg, #5ba8ec, #7fc1f4);
-}
-
-.prefecture-button[data-map-region="chubu"],
-.prefecture-button[data-map-region="kansai"] {
-  color: white;
-  background: linear-gradient(135deg, #8edb38, #b8ee47);
-}
-
-.prefecture-button[data-map-region="chugoku"] {
-  color: white;
-  background: linear-gradient(135deg, #d7c13a, #e7d76d);
-}
-
-.prefecture-button[data-map-region="shikoku"] {
-  color: white;
-  background: linear-gradient(135deg, #d69f42, #e7bd69);
-}
-
-.prefecture-button[data-map-region="kyushu"],
-.prefecture-button[data-map-region="okinawa"] {
-  color: white;
-  background: linear-gradient(135deg, #e879c1, #ed9bd1);
+.prefecture-name {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: clamp(0.38rem, 0.58vw, 0.52rem);
+  font-weight: 780;
+  letter-spacing: 0;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translateY(-0.5px);
 }
 
 .prefecture-button.is-visited {
   color: white;
   background: linear-gradient(135deg, var(--rose-500), var(--rose-300));
   border-color: rgb(255 255 255 / 52%);
-  box-shadow: 0 16px 36px rgb(236 120 156 / 30%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 40%),
+    0 8px 18px rgb(236 120 156 / 18%);
 }
 
 .prefecture-button:disabled {
   cursor: default;
-  opacity: 0.5;
+  opacity: 1;
 }
 
 .prefecture-button.is-visited:hover {
@@ -522,36 +526,6 @@ img {
   align-content: start;
   gap: 16px;
   padding: 8px 0;
-}
-
-.metric-list {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-}
-
-.metric-list div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px 14px;
-  background: rgb(255 255 255 / 62%);
-  border: 1px solid rgb(255 255 255 / 70%);
-  border-radius: 16px;
-  corner-shape: superellipse(1.15);
-}
-
-.metric-list dt,
-.metric-list dd {
-  margin: 0;
-}
-
-.metric-list dt {
-  color: var(--muted);
-}
-
-.metric-list dd {
-  font-weight: 760;
 }
 
 .timeline-card {
@@ -648,7 +622,7 @@ img {
 }
 
 .post-card p,
-.topic-card p,
+topic-card p,
 .soft-panel p,
 .post-meta {
   margin: 0;
@@ -934,7 +908,7 @@ img {
   }
 
   .map-shell {
-    padding: 14px;
+    padding: 18px;
   }
 
   .timeline-list {
