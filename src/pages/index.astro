@@ -8,6 +8,7 @@ import { otherTopics, studyTopics } from '@/data/topics';
 
 const japanTrips = travelTrips.filter((trip) => trip.region === 'japan');
 const worldTrips = travelTrips.filter((trip) => trip.region === 'world');
+const japanTimeline = [...japanTrips].sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
 const mapPoints = prefectures.map((prefecture) => {
   const trips = tripsByPrefecture[prefecture.key] ?? [];
   return {
@@ -77,8 +78,7 @@ const mapPoints = prefectures.map((prefecture) => {
                 data-map-region={point.region}
                 data-trips={JSON.stringify(point.trips)}
               >
-                <strong>{point.ko}</strong>
-                <small>{point.jp}</small>
+                <span class="sr-only">{point.ko}</span>
               </button>
             ))}
           </div>
@@ -102,6 +102,21 @@ const mapPoints = prefectures.map((prefecture) => {
                 <dd>117</dd>
               </div>
             </dl>
+            <div class="timeline-card">
+              <div class="timeline-head">
+                <p class="eyebrow">Timeline</p>
+                <h3>여행 연표</h3>
+              </div>
+              <div class="timeline-list" tabindex="0" aria-label="일본 여행 연표">
+                {japanTimeline.map((trip) => (
+                  <a href={`/categories/travel/${trip.slug}`}>
+                    <time>{trip.yearMonth}</time>
+                    <span>{trip.title}</span>
+                    <small>{trip.count} posts</small>
+                  </a>
+                ))}
+              </div>
+            </div>
           </aside>
         </div>
       </div>
@@ -206,7 +221,23 @@ const mapPoints = prefectures.map((prefecture) => {
     const dialogTitle = document.querySelector('[data-dialog-title]');
     const dialogRegion = document.querySelector('[data-dialog-region]');
     const dialogList = document.querySelector('[data-dialog-list]');
-    const closeDialog = () => dialog?.setAttribute('hidden', '');
+    let closeTimer: ReturnType<typeof window.setTimeout> | undefined;
+    const openDialog = () => {
+      if (!dialog) return;
+      if (closeTimer) window.clearTimeout(closeTimer);
+      dialog.classList.remove('is-closing');
+      dialog.removeAttribute('hidden');
+      window.requestAnimationFrame(() => dialog.classList.add('is-open'));
+    };
+    const closeDialog = () => {
+      if (!dialog || dialog.hasAttribute('hidden')) return;
+      dialog.classList.remove('is-open');
+      dialog.classList.add('is-closing');
+      closeTimer = window.setTimeout(() => {
+        dialog.setAttribute('hidden', '');
+        dialog.classList.remove('is-closing');
+      }, 190);
+    };
 
     document.querySelector('[data-dialog-close]')?.addEventListener('click', closeDialog);
     dialog?.addEventListener('click', (event) => {
@@ -236,7 +267,7 @@ const mapPoints = prefectures.map((prefecture) => {
             `
           )
           .join('');
-        dialog.removeAttribute('hidden');
+        openDialog();
       });
     });
   </script>
