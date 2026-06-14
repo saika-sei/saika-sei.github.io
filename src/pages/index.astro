@@ -1,0 +1,243 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { prefectures } from '@/data/prefectures';
+import { primaryCategories } from '@/data/site';
+import { recentPosts } from '@/data/posts';
+import { travelTrips, tripsByPrefecture, visitedPrefectures } from '@/data/travel';
+import { otherTopics, studyTopics } from '@/data/topics';
+
+const japanTrips = travelTrips.filter((trip) => trip.region === 'japan');
+const worldTrips = travelTrips.filter((trip) => trip.region === 'world');
+const mapPoints = prefectures.map((prefecture) => {
+  const trips = tripsByPrefecture[prefecture.key] ?? [];
+  return {
+    ...prefecture,
+    active: trips.length > 0,
+    trips: trips.map((trip) => ({
+      title: trip.title,
+      count: trip.count,
+      href: `/categories/travel/${trip.slug}`,
+      summary: trip.summary
+    }))
+  };
+});
+---
+
+<Layout landing title="Sei Irodori" description="여행, 공부, 취향 기록">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-field" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="hero-content" data-hero-sentinel>
+      <p class="eyebrow">Travel · Study · Archive</p>
+      <h1 id="hero-title">Sei Irodori</h1>
+      <p class="hero-copy">여행, 공부, 취향 기록.</p>
+      <nav class="hero-nav" aria-label="랜딩 카테고리">
+        {primaryCategories.map((category) => (
+          <a class="hero-link" href={`/categories/${category.slug}`}>{category.title}</a>
+        ))}
+      </nav>
+    </div>
+    <a class="scroll-cue" href="#travel" aria-label="여행 섹션으로 이동"></a>
+  </section>
+
+  <section class="page-section" id="travel" aria-labelledby="travel-title">
+    <div class="section-inner">
+      <div class="section-heading">
+        <p class="eyebrow">Travel Map</p>
+        <h2 id="travel-title">지도에서 꺼내는 여행</h2>
+        <p>방문한 현은 분홍색으로 표시했습니다.</p>
+      </div>
+
+      <div class="travel-switch" role="tablist" aria-label="여행 지역 선택">
+        <button class="is-active" type="button" role="tab" aria-selected="true" data-travel-tab="japan">
+          일본
+        </button>
+        <button type="button" role="tab" aria-selected="false" data-travel-tab="world">
+          일본 이외
+        </button>
+      </div>
+
+      <div class="travel-panel" data-travel-panel="japan">
+        <div class="map-shell">
+          <div class="japan-map" aria-label="일본 현별 여행 지도">
+            <div class="map-ribbon" aria-hidden="true"></div>
+            {mapPoints.map((point) => (
+              <button
+                class:list={['prefecture-button', point.active && 'is-visited']}
+                type="button"
+                style={`--x:${point.x};--y:${point.y};--w:${point.w};--h:${point.h}`}
+                disabled={!point.active}
+                aria-label={`${point.ko}${point.active ? `, 여행 ${point.trips.length}개` : ', 방문 기록 없음'}`}
+                data-prefecture-button={point.active ? 'true' : undefined}
+                data-prefecture-name={point.ko}
+                data-prefecture-region={point.region}
+                data-map-region={point.region}
+                data-trips={JSON.stringify(point.trips)}
+              >
+                <strong>{point.ko}</strong>
+                <small>{point.jp}</small>
+              </button>
+            ))}
+          </div>
+          <aside class="map-aside">
+            <div class="section-heading slim">
+              <p class="eyebrow">Japan</p>
+              <h2>일본</h2>
+              <p>{visitedPrefectures.length}개 현, {japanTrips.length}개 여행.</p>
+            </div>
+            <dl class="metric-list">
+              <div>
+                <dt>방문 현</dt>
+                <dd>{visitedPrefectures.length}</dd>
+              </div>
+              <div>
+                <dt>일본 여행</dt>
+                <dd>{japanTrips.length}</dd>
+              </div>
+              <div>
+                <dt>전체 여행 글</dt>
+                <dd>117</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </div>
+
+      <div class="travel-panel" data-travel-panel="world" hidden>
+        <div class="world-grid">
+          {worldTrips.map((trip) => (
+            <a class="post-card" href={`/categories/travel/${trip.slug}`}>
+              <span class="count-badge">{trip.count} posts</span>
+              <div>
+                <h3>{trip.title}</h3>
+              </div>
+              <p class="post-meta">{trip.countries.join(' · ')}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="recent-title">
+    <div class="section-inner">
+      <div class="section-heading center">
+        <p class="eyebrow">Latest</p>
+        <h2 id="recent-title">최근 기록</h2>
+      </div>
+      <div class="post-grid">
+        {recentPosts.slice(0, 3).map((post) => (
+          <a class="post-card" href={`/posts/${post.slug}`}>
+            <span class="count-badge">{post.category}</span>
+            <div>
+              <h3>{post.title}</h3>
+            </div>
+            <p class="post-meta">{post.date}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section" aria-labelledby="archive-title">
+    <div class="section-inner">
+      <div class="section-heading">
+        <p class="eyebrow">Archive</p>
+        <h2 id="archive-title">공부와 기타</h2>
+        <p>짧게 모아두는 노트.</p>
+      </div>
+      <div class="topic-grid">
+        {[...studyTopics, ...otherTopics].map((topic) => (
+          <a class="topic-card" href={`/categories/${topic.parent}/${topic.slug}`}>
+            <span class="count-badge">{topic.count} posts</span>
+            <div>
+              <h3>{topic.title}</h3>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="trip-dialog" data-trip-dialog hidden>
+    <div class="dialog-surface" role="dialog" aria-modal="true" aria-labelledby="trip-dialog-title">
+      <div class="dialog-top">
+        <div>
+          <p class="eyebrow" data-dialog-region></p>
+          <h3 id="trip-dialog-title" data-dialog-title></h3>
+        </div>
+        <button class="icon-button" type="button" data-dialog-close aria-label="닫기">×</button>
+      </div>
+      <div class="dialog-list" data-dialog-list></div>
+    </div>
+  </div>
+
+  <script>
+    const header = document.querySelector('[data-site-header]');
+    const sentinel = document.querySelector('[data-hero-sentinel]');
+    const setDockedHeader = () => {
+      const threshold = sentinel instanceof HTMLElement ? sentinel.offsetTop + sentinel.offsetHeight * 0.68 : 220;
+      header?.classList.toggle('is-docked', window.scrollY > threshold);
+    };
+
+    setDockedHeader();
+    window.addEventListener('scroll', setDockedHeader, { passive: true });
+
+    const tabs = [...document.querySelectorAll('[data-travel-tab]')];
+    const panels = [...document.querySelectorAll('[data-travel-panel]')];
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-travel-tab');
+        tabs.forEach((button) => {
+          const selected = button === tab;
+          button.classList.toggle('is-active', selected);
+          button.setAttribute('aria-selected', String(selected));
+        });
+        panels.forEach((panel) => {
+          panel.toggleAttribute('hidden', panel.getAttribute('data-travel-panel') !== target);
+        });
+      });
+    });
+
+    const dialog = document.querySelector('[data-trip-dialog]');
+    const dialogTitle = document.querySelector('[data-dialog-title]');
+    const dialogRegion = document.querySelector('[data-dialog-region]');
+    const dialogList = document.querySelector('[data-dialog-list]');
+    const closeDialog = () => dialog?.setAttribute('hidden', '');
+
+    document.querySelector('[data-dialog-close]')?.addEventListener('click', closeDialog);
+    dialog?.addEventListener('click', (event) => {
+      if (event.target === dialog) closeDialog();
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeDialog();
+    });
+
+    document.querySelectorAll('[data-prefecture-button]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const trips = /** @type {{ href: string; title: string; summary: string; count: number }[]} */ (
+          JSON.parse(button.getAttribute('data-trips') || '[]')
+        );
+        if (!dialog || !dialogTitle || !dialogRegion || !dialogList) return;
+
+        dialogTitle.textContent = `${button.getAttribute('data-prefecture-name')} 여행`;
+        dialogRegion.textContent = button.getAttribute('data-prefecture-region') || '';
+        dialogList.innerHTML = trips
+          .map(
+            (trip: { href: string; title: string; summary: string; count: number }) => `
+              <a href="${trip.href}">
+                <strong>${trip.title}</strong>
+                <span>${trip.summary}</span>
+                <small>${trip.count} posts</small>
+              </a>
+            `
+          )
+          .join('');
+        dialog.removeAttribute('hidden');
+      });
+    });
+  </script>
+</Layout>

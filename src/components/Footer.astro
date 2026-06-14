@@ -1,0 +1,15 @@
+---
+import { primaryCategories, site } from '@/data/site';
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a class="footer-brand" href="/">{site.title}</a>
+    <nav class="footer-nav" aria-label="푸터 카테고리">
+      {primaryCategories.map((category) => (
+        <a href={`/categories/${category.slug}`}>{category.title}</a>
+      ))}
+    </nav>
+    <p>© 2026 {site.title}.</p>
+  </div>
+</footer>

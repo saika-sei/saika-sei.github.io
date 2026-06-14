@@ -1,0 +1,41 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { posts } from '@/data/posts';
+import { studyTopics } from '@/data/topics';
+
+export function getStaticPaths() {
+  return studyTopics.map((topic) => ({
+    params: { slug: topic.slug },
+    props: { topic }
+  }));
+}
+
+const { topic } = Astro.props;
+const topicPosts = posts.filter((post) => post.topicSlug === topic.slug);
+---
+
+<Layout title={topic.title} description={topic.summary} activeCategory="study">
+  <section class="page-hero">
+    <div class="section-heading">
+      <p class="eyebrow">Study</p>
+      <h1>{topic.title}</h1>
+      <p>{topic.summary}</p>
+      <span class="count-badge">{topic.count} posts</span>
+    </div>
+  </section>
+  <section class="content-section">
+    <div class="section-inner">
+      <div class="post-grid">
+        {topicPosts.map((post) => (
+          <a class="post-card" href={`/posts/${post.slug}`}>
+            <span class="count-badge">{post.date}</span>
+            <div>
+              <h3>{post.title}</h3>
+              <p>{post.excerpt}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

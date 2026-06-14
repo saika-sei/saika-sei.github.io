@@ -1,0 +1,97 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { primaryCategories, type PrimaryCategorySlug } from '@/data/site';
+import { posts } from '@/data/posts';
+import { travelTrips } from '@/data/travel';
+import { otherTopics, studyTopics } from '@/data/topics';
+
+export function getStaticPaths() {
+  return primaryCategories.map((category) => ({
+    params: { slug: category.slug },
+    props: { category }
+  }));
+}
+
+const { category } = Astro.props;
+const categoryPosts = posts.filter((post) => post.category === category.slug);
+const childItems =
+  category.slug === 'travel'
+    ? travelTrips.map((trip) => ({
+        href: `/categories/travel/${trip.slug}`,
+        title: trip.title,
+        count: trip.count,
+        summary: trip.summary,
+        meta: trip.region === 'japan' ? trip.prefectures.length ? trip.prefectures.join(' · ') : '일본' : trip.countries.join(' · ')
+      }))
+    : category.slug === 'study'
+      ? studyTopics.map((topic) => ({
+          href: `/categories/study/${topic.slug}`,
+          title: topic.title,
+          count: topic.count,
+          summary: topic.summary,
+          meta: 'Study'
+        }))
+      : otherTopics.map((topic) => ({
+          href: `/categories/other/${topic.slug}`,
+          title: topic.title,
+          count: topic.count,
+          summary: topic.summary,
+          meta: 'Other'
+        }));
+const activeCategory = category.slug as PrimaryCategorySlug;
+---
+
+<Layout
+  title={category.title}
+  description={category.description}
+  activeCategory={activeCategory}
+>
+  <section class="page-hero">
+    <div class="section-heading">
+      <p class="eyebrow">Category</p>
+      <h1>{category.title}</h1>
+      <p>{category.description}</p>
+      <div class="pill-row">
+        <span class="count-badge">{category.count} posts</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-inner">
+      <div class="category-list">
+        {childItems.map((item) => (
+          <a class="category-row" href={item.href}>
+            <div>
+              <h3>{item.title}</h3>
+            </div>
+            <div>
+              <span class="count-badge">{item.count}</span>
+              <p class="post-meta">{item.meta}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {categoryPosts.length > 0 && (
+        <div class="page-section">
+          <div class="section-heading slim">
+            <p class="eyebrow">Posts</p>
+            <h2>최근 글</h2>
+          </div>
+          <div class="post-grid">
+            {categoryPosts.map((post) => (
+              <a class="post-card" href={`/posts/${post.slug}`}>
+                <span class="count-badge">{post.date}</span>
+                <div>
+                  <h3>{post.title}</h3>
+                  <p>{post.excerpt}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,34 @@
+---
+import Comments from '@/components/Comments.astro';
+import Layout from '@/layouts/Layout.astro';
+import { posts } from '@/data/posts';
+
+export function getStaticPaths() {
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const dateText = new Intl.DateTimeFormat('ko-KR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(new Date(post.date));
+---
+
+<Layout title={post.title} description={post.excerpt} activeCategory={post.category}>
+  <article class="post-article">
+    <p class="eyebrow">{post.category}</p>
+    <h1>{post.title}</h1>
+    <p class="post-meta">{dateText}</p>
+    <div class="tag-list">
+      {post.tags.map((tag) => <span>#{tag}</span>)}
+    </div>
+    <div class="post-body">
+      {post.body.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+  </article>
+  <Comments />
+</Layout>

@@ -1,0 +1,14 @@
+---
+import { site } from '@/data/site';
+
+const commentsRepo = import.meta.env.PUBLIC_COMMENTS_REPO || site.repository;
+const commentsScript = `<script src="https://utteranc.es/client.js" repo="${commentsRepo}" issue-term="pathname" label="comments" theme="github-light" crossorigin="anonymous" async></script>`;
+---
+
+<section class="comments-section" aria-label="댓글">
+  <div class="section-heading slim">
+    <p class="eyebrow">Comments</p>
+    <h2>댓글</h2>
+  </div>
+  <Fragment set:html={commentsScript} />
+</section>

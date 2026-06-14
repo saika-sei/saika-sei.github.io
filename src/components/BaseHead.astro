@@ -1,0 +1,25 @@
+---
+import { site } from '@/data/site';
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const { title = site.title, description = site.description } = Astro.props;
+const pageTitle = title === site.title ? site.title : `${title} | ${site.title}`;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="generator" content={Astro.generator} />
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={site.url} />
+<meta property="og:image" content="/og-image.svg" />
+<meta name="theme-color" content="#f7a8bd" />
+<link rel="icon" href="/favicon.svg" />
+<link rel="preconnect" href="https://utteranc.es" />

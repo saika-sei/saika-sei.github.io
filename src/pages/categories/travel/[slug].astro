@@ -1,0 +1,66 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { posts } from '@/data/posts';
+import { travelTrips } from '@/data/travel';
+
+export function getStaticPaths() {
+  return travelTrips.map((trip) => ({
+    params: { slug: trip.slug },
+    props: { trip }
+  }));
+}
+
+const { trip } = Astro.props;
+const tripPosts = posts.filter((post) => post.tripSlug === trip.slug);
+---
+
+<Layout title={trip.title} description={trip.summary} activeCategory="travel">
+  <section class="page-hero">
+    <div class="section-heading">
+      <p class="eyebrow">Travel</p>
+      <h1>{trip.title}</h1>
+      <p>{trip.summary}</p>
+      <div class="pill-row">
+        <span class="count-badge">{trip.count} posts</span>
+        <span class="count-badge">{trip.yearMonth}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="section-inner">
+      <div class="soft-panel">
+        <div class="section-heading slim">
+          <p class="eyebrow">{trip.region === 'japan' ? 'Japan' : 'World'}</p>
+          <h2>여행 색인</h2>
+          <p>{trip.region === 'japan' ? trip.prefectures.join(' · ') : trip.countries.join(' · ')}</p>
+        </div>
+      </div>
+
+      <div class="page-section">
+        <div class="section-heading slim">
+          <p class="eyebrow">Posts</p>
+          <h2>글 목록</h2>
+        </div>
+        {tripPosts.length > 0 ? (
+          <div class="post-grid">
+            {tripPosts.map((post) => (
+              <a class="post-card" href={`/posts/${post.slug}`}>
+                <span class="count-badge">{post.date}</span>
+                <div>
+                  <h3>{post.title}</h3>
+                  <p>{post.excerpt}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div class="soft-panel">
+            <h3>아직 글을 정리하는 중입니다.</h3>
+            <p>카테고리 구조와 지도 연결은 먼저 준비되어 있습니다.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+</Layout>

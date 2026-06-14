@@ -1,0 +1,26 @@
+---
+import { primaryCategories, site, type PrimaryCategorySlug } from '@/data/site';
+
+type Props = {
+  activeCategory?: PrimaryCategorySlug;
+};
+
+const { activeCategory } = Astro.props;
+---
+
+<header class="site-header" data-site-header>
+  <a class="brand-link" href="/" aria-label={`${site.title} 홈`}>
+    <span class="brand-mark">彩</span>
+    <span class="brand-name">{site.title}</span>
+  </a>
+  <nav class="site-nav" aria-label="주요 카테고리">
+    {primaryCategories.map((category) => (
+      <a
+        href={`/categories/${category.slug}`}
+        class:list={['nav-link', activeCategory === category.slug && 'is-active']}
+      >
+        {category.title}
+      </a>
+    ))}
+  </nav>
+</header>

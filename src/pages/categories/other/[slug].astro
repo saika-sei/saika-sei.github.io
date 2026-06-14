@@ -1,0 +1,48 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { posts } from '@/data/posts';
+import { otherTopics } from '@/data/topics';
+
+export function getStaticPaths() {
+  return otherTopics.map((topic) => ({
+    params: { slug: topic.slug },
+    props: { topic }
+  }));
+}
+
+const { topic } = Astro.props;
+const topicPosts = posts.filter((post) => post.topicSlug === topic.slug);
+---
+
+<Layout title={topic.title} description={topic.summary} activeCategory="other">
+  <section class="page-hero">
+    <div class="section-heading">
+      <p class="eyebrow">Other</p>
+      <h1>{topic.title}</h1>
+      <p>{topic.summary}</p>
+      <span class="count-badge">{topic.count} posts</span>
+    </div>
+  </section>
+  <section class="content-section">
+    <div class="section-inner">
+      {topicPosts.length > 0 ? (
+        <div class="post-grid">
+          {topicPosts.map((post) => (
+            <a class="post-card" href={`/posts/${post.slug}`}>
+              <span class="count-badge">{post.date}</span>
+              <div>
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="soft-panel">
+          <h3>아직 글을 정리하는 중입니다.</h3>
+          <p>분류와 링크 구조는 준비되어 있습니다.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>
